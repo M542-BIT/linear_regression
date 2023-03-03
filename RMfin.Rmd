@@ -1,0 +1,113 @@
+---
+title: "rm1"
+author: "Malavika"
+date: "2023-03-02"
+output: html_document
+---
+
+#To investigate the effect of recommendation modality on whether people are likely to follow the recommendation, we can use logistic regression analysis. Specifically, we can fit a logistic regression model with the binary variable RecommendationFollowed as the response variable and Mode as the predictor variable. We will also include Gender, Age, Competent, Intelligent, Thoughtful, CompositeIntellect, and Stimulus as covariates to control for potential confounding effects.
+
+
+```{r} 
+library(readxl)
+
+data <- read_excel("recommendations.xlsx")
+model <- glm(RecommendationFollowed ~ Mode + Gender + Age + Competent + Intelligent + Thoughtful + CompositeIntellect + Stimulus, data = data, family = binomial)
+summary(model)
+
+```
+
+#Interpretation for result
+
+#The output is from a logistic regression model with a binary response variable "RecommendationFollowed" and multiple predictor variables. The "ModeVisual" coefficient estimate is -0.7693, indicating that when the recommendation is presented visually, the log odds of following the recommendation decrease by 0.7693 compared to when it is presented auditorily. This coefficient is significant at the 0.05 level, meaning that there is strong evidence that the mode of recommendation has a significant effect on whether the recommendation is followed.
+#The coefficients for "Gender", "Age", "Competent", "Intelligent", "Thoughtful", and "CompositeIntellect" are not significant at the 0.05 level, indicating that these variables do not have a significant effect on whether the recommendation is followed after controlling for the other variables in the model. The coefficients for "StimulusCreditCard", "StimulusExtensionCord", and "StimulusRestaurant" are all significant at the 0.05 level, indicating that the specific stimulus used in the trial has a significant effect on whether the recommendation is followed.
+#To assess the goodness of fit of the model, one can look at the residual deviance and the AIC. The residual deviance is 1820.4 on 1561 degrees of freedom, indicating that the model fits the data well. The AIC is 1842.4, which is a measure of the model's quality relative to other models, with lower values indicating better fit.
+
+```{r}
+library(ggplot2)
+ggplot(data, aes(x = Mode, y = RecommendationFollowed)) +
+  geom_bar(stat = "summary", fun = "mean", fill = "blue") +
+  labs(x = "Recommendation Modality", y = "Proportion Followed")
+
+```
+
+
+
+```{r}
+ggplot(data, aes(x = Mode, y = RecommendationFollowed)) +
+  geom_violin(fill = "blue", draw_quantiles = c(0.25, 0.5, 0.75)) +
+  labs(x = "Recommendation Modality", y = "Recommendation Followed")
+
+
+```
+
+```{r}
+library(tidyr)
+library(readxl)
+library(dplyr)
+```
+
+# Load data
+```{r}
+library(readxl)
+faces <- read_excel("faces.xlsx")
+```
+
+# Remove irrelevant columns
+```{r}
+faces <- faces %>% select(-c(Karolinska_Label, Todorov_Label, gender))
+```
+
+# Standardize variables
+```{r}
+faces_std <- scale(faces)
+```
+
+# Perform principal component analysis
+```{r}
+pca <- princomp(faces_std, cor = TRUE)
+```
+
+# Print the results
+```{r}
+summary(pca)
+```
+
+```{r}
+library(readxl)
+faces_big <- read_excel("faces_big.xlsx")
+```
+
+```{r}
+faces_big_subset <- faces_big[, c("trustworthy", "caring", "responsible", "sociable", "dominant", "confident", "aggressive", "mean")]
+```
+
+```{R}
+library(lavaan)
+```
+
+# Define the measurement model
+```{r}
+model <- "
+  # Define the latent factors
+  valence =~ trustworthy + caring + responsible + sociable
+  dominance =~ dominant + confident + aggressive + mean
+"
+```
+
+# Fit the model to the data
+```{r}
+fit <- cfa(model, data = faces_big_subset)
+summary(fit)
+```
+
+#To define the latent factors for use in confirmatory factor analysis according to Dr Hughes' predictions, we need to create a measurement model that specifies which observed variables (i.e., the facial trait ratings) load onto which latent factors (i.e., valence and dominance). We can do this using the lavaan package in R.
+
+#Interpretation of result in the script ques_3.R
+
+#The confirmatory factor analysis (CFA) results show that the two-factor model proposed by Dr Hughes fits the data well. The test statistic (Chi-square) is significant, indicating that the model is a good fit for the data.
+#The factor loadings in the model suggest that trustworthy, caring, and sociable all have high positive loadings on the valence factor, while responsible has a slightly lower positive loading. This supports Dr Hughes' hypothesis that these variables load onto the valence factor.
+#Similarly, dominant has a high positive loading on the dominance factor, while confident has a negative loading, and aggressive and mean have high positive loadings. This also supports Dr Hughes' hypothesis that these variables load onto the dominance factor.
+#The covariance between the valence and dominance factors is negative and significant, indicating that there is a negative relationship between the two factors.
+
+#Overall, these results suggest that Dr Hughes' two-factor model fits the data well and that trustworthy, caring, responsible, sociable, dominant, confident, aggressive, and mean can be used as indicators of the valence and dominance factors
