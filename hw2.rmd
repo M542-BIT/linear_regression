@@ -1,0 +1,125 @@
+---
+title: "hw2 rmd"
+author: "Malavika"
+date: "2023-03-23"
+output: html_document
+---
+
+```{r}
+library(ggplot2)
+library(readxl)
+library(tidyverse)
+library(tidyselect)
+```
+
+#we load the data
+
+```{r}
+movies_ <- read_excel("movies .xlsx")
+summary(movies_)
+#to create a plot between bechedel test pass and budget 
+ggplot(movies_, aes(binary, budget)) + geom_boxplot()
+```
+
+# *Fit the logistic regression model*
+
+```{r}
+model <- glm(pass ~ budget, data = movies_, family = binomial())
+```
+
+# Print the model summary
+
+```{r}
+summary(model)
+```
+
+# Load the data and fit the model
+
+```{r}
+movies_ <- read_excel("movies .xlsx")
+model <- glm(pass ~ budget, data = movies_, family = binomial())
+```
+
+# Define a new movie with a budget of \$20,000,000
+
+```{r}
+new_movie <- tibble(budget = 20000000)
+```
+
+# Predict the probability of passing the Bechdel test for the new movie
+
+```{r}
+prob_pass <- predict(model, newdata = new_movie, type = "response")
+```
+
+# Print the predicted probability
+
+```{r}
+print(prob_pass)
+```
+
+#2 \# Load the tidyverse package
+
+```{r}
+library(tidyverse)
+```
+
+# Load the data
+
+```{r}
+reading_ <- read_excel("reading .xlsx")
+```
+
+# Create a plot of the mean scores by intervention and reward
+
+```{r}
+ggplot(reading_, aes(intervention, score, fill = reward)) + geom_boxplot() + geom_jitter()
+Score ~ Intervention * Reward + (intervention*reward| classl)
+```
+
+# Load the lme4 package
+
+```{r}
+library(lme4)
+```
+
+# Fit the mixed effects model
+
+```{r}
+reading_model <- lmer(score ~ intervention * reward + (intervention*reward|class), data = reading_)
+```
+
+# Extract the model coefficients
+
+```{r}
+summary(model)$coefficients
+```
+
+#For example, if the coefficient for the Intervention variable is positive and statistically significant, it would suggest that the intervention had a positive effect on the score outcome. Similarly, if the coefficient for the Reward variable is positive and statistically significant, it would suggest that the reward had a positive effect on the score outcome. If the coefficient for the interaction term Intervention:Reward is statistically significant, it would suggest that the effect of the intervention on the score outcome depends on whether a child receives a reward or not. #We can also examine the variance components for the random intercepts to understand the proportion of variation in the score outcome that can be attributed to the school and child levels. If the variance component for the School random intercept is large compared to the residual variance, it would suggest that there are school-level factors that are important in explaining the score outcome. Similarly, if the variance component for the School:Child random intercept is large compared to the residual variance, it would suggest that there are individual-level factors that are important in explaining the score outcome. #Overall, the mixed effects model can help us understand the effects of the intervention and reward conditions on the score outcome while accounting for the nested structure of the data. By examining the model coefficients and variance components, we can draw conclusions about the significance and size of these effects, as well as the amount of variation in the score outcome that can be attributed to different levels of the data hierarchy.
+
+#3 \# Setting up parameters
+
+```{r}
+complexity <- seq(1, 20)
+mean_rt <- 10 + 3 * complexity
+sd_rt <- 2
+```
+
+# Simulating data for 10 participants
+
+```{r}
+data <- data.frame(Participant = rep(1:10, each = 20),
+                   Trial = rep(complexity, 10),
+                   RT = rnorm(200, mean = mean_rt, sd = sd_rt))
+```
+
+# Plotting the simulated data
+
+```{r}
+library(ggplot2)
+ggplot(data, aes(x = Trial, y = RT, color = factor(Participant))) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE) +
+  labs(x = "Complexity rating", y = "Rt(s)",
+       title = "Simul.data for visual search experiment")
+```
